@@ -1,11 +1,12 @@
 package game;
 
-import graphics.Graphics;
 import javafx.animation.PauseTransition;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
+
+import java.util.*;
 
 import static graphics.Graphics.background;
 import static graphics.Graphics.refresh;
@@ -14,6 +15,7 @@ public class Game {
     private static int previousRow = -1;
     private static int previousCol = -1;
     private static final char[][] field = testCharField();
+    private static final Map<String, Boolean> words = initWords();
 
     private Game(){
         throw new IllegalStateException("Utility class");
@@ -26,16 +28,15 @@ public class Game {
                 previousCol = posC;
                 label.setBackground(background());
             } else {
-                System.out.println("Word: " + checkWord(previousRow, previousCol, posR, posC));
+                var quess = checkWord(previousRow, previousCol, posR, posC).toLowerCase();
+                System.out.println("Word: " + quess);
                 label.setBackground(background());
+                if (isWordCorrect(quess))
+                    changeWord(quess);
                 previousRow = -1;
                 previousCol = -1;
-                System.out.println("Initializing pause");
                 var pause = new PauseTransition(Duration.millis(2000));
-                pause.setOnFinished(event -> {
-                    refresh();
-                    System.out.println("Pause done, field refreshed!");
-                });
+                pause.setOnFinished(event -> refresh());
                 pause.play();
             }
         };
@@ -102,6 +103,28 @@ public class Game {
         return text.toString();
     }
 
+    private static Map<String, Boolean> initWords(){
+        var map = new LinkedHashMap<String, Boolean>();
+
+        map.put("yes", false);
+        map.put("no", false);
+        map.put("print", false);
+        map.put("why", false);
+        map.put("abc", false);
+
+        map.put("boom", false);
+        map.put("cool", false);
+        map.put("duh", false);
+        map.put("fool", false);
+        map.put("pool", false);
+
+        return map;
+    }
+
+    public static Map<String, Boolean> getWords(){
+        return words;
+    }
+
     public static char[][] testCharField(){
         var field = new char[10][10];
         var character = 60;
@@ -109,7 +132,22 @@ public class Game {
             for(var j = 0; j < 10; j++){
                 field[i][j] = ((char)(character++));
             }
-
+        field[0][0] = 'y';
+        field[0][1] = 'e';
+        field[0][2] = 's';
         return field;
+    }
+
+    private static boolean isWordCorrect(String word){
+        for (Map.Entry<String, Boolean> entry : words.entrySet())
+            if (word.equals(entry.getKey()))
+                return true;
+        return false;
+    }
+
+    private static void changeWord(String word){
+        for (Map.Entry<String, Boolean> entry : words.entrySet())
+            if (word.equals(entry.getKey()))
+                words.put(word, true);
     }
 }
