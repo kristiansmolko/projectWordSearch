@@ -8,8 +8,7 @@ import javafx.util.Duration;
 
 import java.util.*;
 
-import static graphics.Graphics.background;
-import static graphics.Graphics.refresh;
+import static graphics.Graphics.*;
 
 public class Game {
     private static int previousRow = -1;
@@ -31,11 +30,14 @@ public class Game {
                 var quess = checkWord(previousRow, previousCol, posR, posC).toLowerCase();
                 System.out.println("Word: " + quess);
                 label.setBackground(background());
-                if (isWordCorrect(quess))
+                if (isWordCorrect(quess)) {
                     changeWord(quess);
+//                    System.out.println(previousRow + ":" + previousCol + "\n" + posR + ":" + posC);
+                    addCrossOut(previousRow, previousCol, posR, posC);
+                }
                 previousRow = -1;
                 previousCol = -1;
-                var pause = new PauseTransition(Duration.millis(2000));
+                var pause = new PauseTransition(Duration.millis(1000));
                 pause.setOnFinished(event -> refresh());
                 pause.play();
             }
@@ -112,7 +114,7 @@ public class Game {
         map.put("why", false);
         map.put("abc", false);
 
-        map.put("boom", false);
+        map.put("on", false);
         map.put("cool", false);
         map.put("duh", false);
         map.put("fool", false);
@@ -135,6 +137,9 @@ public class Game {
         field[0][0] = 'y';
         field[0][1] = 'e';
         field[0][2] = 's';
+
+        field[5][4] = 'n';
+        field[6][5] = 'o';
         return field;
     }
 
