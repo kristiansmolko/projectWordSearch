@@ -5,15 +5,18 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static game.Game.*;
 
 public class Graphics {
     private static final char[][] field = testCharField();
-    private static final GridPane labelField = labelField();
+    private static StackPane labelField = labelField();
     private static final GridPane wordField = wordField(getWords());
     private static final BorderPane root = new BorderPane();
+    private static final List<Line> lines = new ArrayList<>();
 
     public BorderPane board(){
         root.setCenter(labelField);
@@ -22,25 +25,41 @@ public class Graphics {
         return root;
     }
 
-    private static GridPane labelField(){
-        var grid = new GridPane();
-        grid.setTranslateX(200);
-        grid.setTranslateY(20);
-        grid.setVgap(10);
-        grid.setHgap(10);
+    private static StackPane labelField(){
+        var stack = new StackPane();
+
+        stack.setTranslateX(-250);
+        stack.setTranslateY(-200);
 
         for(var i = 0; i < 10; i++) {
             for (var j = 0; j < 10; j++) {
                 var label = new Label(String.valueOf(field[i][j]));
+                label.setTranslateY((40*i));
+                label.setTranslateX((40*j));
                 label.setOnMouseClicked(labelClickedEvent(label, i, j));
                 label.setStyle("-fx-label-padding: 0 0 0 0.75em;");
                 label.setPrefHeight(30);
                 label.setPrefWidth(30);
-                grid.addRow(i, label);
+                stack.getChildren().add(label);
             }
         }
+        if (lines != null && !lines.isEmpty())
+            for (Line line : lines)
+                stack.getChildren().add(line);
 
-        return grid;
+        return stack;
+    }
+
+    public static void addCrossOut(int firstRow, int firstCol, int lastRow, int lastCol){
+        var line = new Line();
+        line.setTranslateX((lastCol*40 + firstCol*40)/2);
+        line.setTranslateY((lastRow*40 + firstRow*40)/2);
+        line.setStartX(40*firstCol);
+        line.setStartY(40*firstRow);
+        line.setEndX(40*lastCol);
+        line.setEndY(40*lastRow);
+
+        lines.add(line);
     }
 
     private static GridPane wordField(Map<String, Boolean> list){
@@ -78,7 +97,8 @@ public class Graphics {
     }
 
     public static void refresh(){
-        root.setCenter(labelField());
+        labelField = labelField();
+        root.setCenter(labelField);
         root.setBottom(wordField(getWords()));
     }
 }
